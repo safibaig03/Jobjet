@@ -66,11 +66,6 @@ export default function AuthPage() {
     queryKey: ["/api/enums"],
   });
 
-  // If user is already logged in, redirect to home page
-  if (user) {
-    return <Redirect to="/" />;
-  }
-
   // Login form
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -108,6 +103,11 @@ export default function AuthPage() {
     const { confirmPassword, ...registerData } = data;
     registerMutation.mutate(registerData as InsertUser);
   };
+
+  // If user is already logged in, redirect to home page
+  if (user) {
+    return <Redirect to="/" />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
