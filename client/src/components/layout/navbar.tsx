@@ -41,31 +41,31 @@ export function Navbar() {
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               <Link href="/">
-                <a className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                <span className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium cursor-pointer ${
                   location === "/" 
                     ? "border-primary text-foreground" 
                     : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
                 }`}>
                   Find Jobs
-                </a>
+                </span>
               </Link>
               <Link href="/companies">
-                <a className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                <span className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium cursor-pointer ${
                   location === "/companies" 
                     ? "border-primary text-foreground" 
                     : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
                 }`}>
                   Companies
-                </a>
+                </span>
               </Link>
               <Link href="/resources">
-                <a className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                <span className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium cursor-pointer ${
                   location === "/resources" 
                     ? "border-primary text-foreground" 
                     : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
                 }`}>
                   Resources
-                </a>
+                </span>
               </Link>
             </div>
           </div>
@@ -149,31 +149,31 @@ export function Navbar() {
               <SheetContent side="right">
                 <div className="py-4 space-y-4">
                   <Link href="/" onClick={closeMobileMenu}>
-                    <a className={`block py-2 px-4 text-base font-medium rounded-md ${
+                    <span className={`block py-2 px-4 text-base font-medium rounded-md cursor-pointer ${
                       location === "/" 
                         ? "bg-primary/10 text-primary" 
                         : "text-foreground hover:bg-accent hover:text-accent-foreground"
                     }`}>
                       Find Jobs
-                    </a>
+                    </span>
                   </Link>
                   <Link href="/companies" onClick={closeMobileMenu}>
-                    <a className={`block py-2 px-4 text-base font-medium rounded-md ${
+                    <span className={`block py-2 px-4 text-base font-medium rounded-md cursor-pointer ${
                       location === "/companies" 
                         ? "bg-primary/10 text-primary" 
                         : "text-foreground hover:bg-accent hover:text-accent-foreground"
                     }`}>
                       Companies
-                    </a>
+                    </span>
                   </Link>
                   <Link href="/resources" onClick={closeMobileMenu}>
-                    <a className={`block py-2 px-4 text-base font-medium rounded-md ${
+                    <span className={`block py-2 px-4 text-base font-medium rounded-md cursor-pointer ${
                       location === "/resources" 
                         ? "bg-primary/10 text-primary" 
                         : "text-foreground hover:bg-accent hover:text-accent-foreground"
                     }`}>
                       Resources
-                    </a>
+                    </span>
                   </Link>
                   
                   {user ? (
@@ -195,28 +195,28 @@ export function Navbar() {
                         </div>
                         <div className="mt-3 space-y-1">
                           <Link href="/profile" onClick={closeMobileMenu}>
-                            <a className="block py-2 px-4 text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground rounded-md">
+                            <span className="block py-2 px-4 text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground rounded-md cursor-pointer">
                               Profile
-                            </a>
+                            </span>
                           </Link>
                           {isCompany && (
                             <Link href="/dashboard" onClick={closeMobileMenu}>
-                              <a className="block py-2 px-4 text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground rounded-md">
+                              <span className="block py-2 px-4 text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground rounded-md cursor-pointer">
                                 Dashboard
-                              </a>
+                              </span>
                             </Link>
                           )}
                           {isCompany && (
                             <Link href="/post-job" onClick={closeMobileMenu}>
-                              <a className="block py-2 px-4 text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground rounded-md">
+                              <span className="block py-2 px-4 text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground rounded-md cursor-pointer">
                                 Post a Job
-                              </a>
+                              </span>
                             </Link>
                           )}
                           <Link href="/applications" onClick={closeMobileMenu}>
-                            <a className="block py-2 px-4 text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground rounded-md">
+                            <span className="block py-2 px-4 text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground rounded-md cursor-pointer">
                               Applications
-                            </a>
+                            </span>
                           </Link>
                           <a 
                             className="block py-2 px-4 text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground rounded-md cursor-pointer"

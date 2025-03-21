@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
@@ -76,7 +77,7 @@ export default function PostJob() {
   });
 
   // Update companyId when company data is loaded
-  React.useEffect(() => {
+  useEffect(() => {
     if (company) {
       form.setValue("companyId", company.id);
     }
