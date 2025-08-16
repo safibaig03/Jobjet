@@ -13,26 +13,36 @@ export class PostgresStorage {
   constructor() {
     const pgSession = connectPgSimple(session);
     
-    // For local development, use regular Pool
-    console.log('Using regular Pool for session store');
-    const sessionPool = new Pool({ connectionString: process.env.DATABASE_URL });
-    
-    // Create session table if it doesn't exist
-    sessionPool.query(`
-    CREATE TABLE IF NOT EXISTS "session" (
-      "sid" varchar NOT NULL COLLATE "default",
-      "sess" json NOT NULL,
-      "expire" timestamp(6) NOT NULL,
-      CONSTRAINT "session_pkey" PRIMARY KEY ("sid")
-    );
-    CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire");
-    `).catch(err => console.error('Error creating session table:', err));
-    
-    this.sessionStore = new pgSession({
-      pool: sessionPool,
-      tableName: 'session',
-      createTableIfMissing: true
-    });
+    if (process.env.NODE_ENV === 'production') {
+      // For Vercel/production, use a memory store as fallback
+      // since Neon serverless doesn't work well with session stores
+      console.log('Using memory store for session in production');
+      const MemoryStore = require('memorystore')(session);
+      this.sessionStore = new MemoryStore({
+        checkPeriod: 86400000 // prune expired entries every 24h
+      });
+    } else {
+      // For local development, use regular Pool
+      console.log('Using regular Pool for session store');
+      const sessionPool = new Pool({ connectionString: process.env.DATABASE_URL });
+      
+      // Create session table if it doesn't exist
+      sessionPool.query(`
+      CREATE TABLE IF NOT EXISTS "session" (
+        "sid" varchar NOT NULL COLLATE "default",
+        "sess" json NOT NULL,
+        "expire" timestamp(6) NOT NULL,
+        CONSTRAINT "session_pkey" PRIMARY KEY ("sid")
+      );
+      CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire");
+      `).catch(err => console.error('Error creating session table:', err));
+      
+      this.sessionStore = new pgSession({
+        pool: sessionPool,
+        tableName: 'session',
+        createTableIfMissing: true
+      });
+    }
 
   }
 
