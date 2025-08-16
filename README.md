@@ -175,39 +175,9 @@ const hasRole = (roles) => (req, res, next) => {
 };
 ```
 
-## 🚀 Deployment Options
+## 🚀 Deployment 
 
-### Option 1: Render
-
-1. Create a new Web Service on Render
-2. Connect your Git repository
-3. Configure the service:
-   - **Build Command**: `npm install && npm run build`
-   - **Start Command**: `npm start`
-   - **Environment Variables**: Add your `DATABASE_URL` and `SESSION_SECRET`
-
-### Option 2: Heroku
-
-1. Create a new Heroku app
-2. Connect your Git repository
-3. Add the Heroku Postgres add-on or use your existing Neon Postgres database
-4. Set environment variables in Heroku dashboard:
-   - `DATABASE_URL` (if not using Heroku Postgres)
-   - `SESSION_SECRET`
-5. Deploy using Git:
-
-```bash
-# Login to Heroku
-heroku login
-
-# Add Heroku remote
-heroku git:remote -a your-app-name
-
-# Push to Heroku
-git push heroku main
-```
-
-### Option 3: Vercel
+ Vercel
 
 1. Install Vercel CLI: `npm i -g vercel`
 2. Login to Vercel: `vercel login`
@@ -216,17 +186,8 @@ git push heroku main
    - `DATABASE_URL`
    - `SESSION_SECRET`
 
-### Option 4: Railway
 
-1. Create a new project on Railway
-2. Connect your Git repository
-3. Add a PostgreSQL database service or use your existing Neon Postgres
-4. Set environment variables:
-   - `DATABASE_URL` (if not using Railway PostgreSQL)
-   - `SESSION_SECRET`
-5. Deploy using the Railway dashboard
-
-## 📊 Database Considerations
+## 📊 Database 
 
 ### Using Neon Postgres
 
@@ -236,48 +197,10 @@ Your application is already configured to use Neon Postgres. Make sure your data
 
 After deploying, you may need to run database migrations:
 
-```bash
-# For Heroku
-heroku run npm run db:push
 
-# For other platforms, access the shell and run
-npm run db:push
-```
-
-## 🔧 Troubleshooting
-
-### Connection Issues
-
-If you encounter database connection issues:
-
-1. Verify your `DATABASE_URL` is correctly set
-2. Ensure your database allows connections from your hosting provider's IP addresses
-3. Check if SSL is required (Neon Postgres requires SSL)
-
-### Session Store Issues
-
-If sessions aren't persisting:
-
-1. Verify the session table exists in your database
-2. Check that `SESSION_SECRET` is set correctly
-
-## 🔍 Production Considerations
-
-1. Set `NODE_ENV=production` in your environment variables
-2. Consider adding a custom domain
-3. Set up HTTPS (most platforms handle this automatically)
-4. Configure proper logging and monitoring
-
-## 🔧 Available Scripts
-
-```bash
-npm run dev          # Start development server (RECOMMENDED)
-npm run build        # Build for production
-npm run start        # Start production server
-npm run check        # TypeScript type checking
-npm run db:push      # Push schema changes to database
-```
-
-## 🤝 Support
-
-If you encounter issues during deployment, refer to your hosting platform's documentation or support channels.
+## ☕ Support My Work
+<p align="center">
+  <a href="https://www.buymeacoffee.com/safibaig03">
+    <img src="https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" height="28">
+  </a>
+</p>
