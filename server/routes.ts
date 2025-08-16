@@ -181,6 +181,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Resources API
+  app.get("/api/resources", async (req, res) => {
+    try {
+      const resources = await storage.getResources();
+      res.json(resources);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch resources" });
+    }
+  });
+
   // Companies API
   app.get("/api/companies", async (req, res) => {
     try {

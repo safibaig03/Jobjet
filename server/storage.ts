@@ -1,4 +1,4 @@
-import { users, User, InsertUser, companies, Company, InsertCompany, jobs, Job, InsertJob, applications, Application, InsertApplication, categories, Category } from "@shared/schema";
+import { users, User, InsertUser, companies, Company, InsertCompany, jobs, Job, InsertJob, applications, Application, InsertApplication, categories, Category, resources, Resource, InsertResource } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
 
@@ -37,6 +37,9 @@ export interface IStorage {
   // Category management
   getCategories(): Promise<Category[]>;
   
+  // Resource management
+  getResources(): Promise<Resource[]>;
+  
   // Session store
   sessionStore: session.SessionStore;
 }
@@ -47,6 +50,7 @@ export class MemStorage implements IStorage {
   private jobsData: Map<number, Job>;
   private applicationsData: Map<number, Application>;
   private categoriesData: Map<number, Category>;
+  private resourcesData: Map<number, Resource>;
   
   public sessionStore: session.SessionStore;
   
@@ -55,6 +59,7 @@ export class MemStorage implements IStorage {
   private jobIdCounter: number;
   private applicationIdCounter: number;
   private categoryIdCounter: number;
+  private resourceIdCounter: number;
 
   constructor() {
     this.usersData = new Map();
@@ -62,19 +67,23 @@ export class MemStorage implements IStorage {
     this.jobsData = new Map();
     this.applicationsData = new Map();
     this.categoriesData = new Map();
+    this.resourcesData = new Map();
     
     this.userIdCounter = 1;
     this.companyIdCounter = 1;
     this.jobIdCounter = 1;
     this.applicationIdCounter = 1;
     this.categoryIdCounter = 1;
+    this.resourceIdCounter = 1;
     
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000 // prune expired entries every 24h
     });
     
-    // Seed some initial categories
+    // Seed some initial categories, companies and resources
     this.seedCategories();
+    this.seedCompanies();
+    this.seedResources();
   }
 
   private seedCategories() {
@@ -94,6 +103,136 @@ export class MemStorage implements IStorage {
       this.categoriesData.set(id, {
         id,
         ...category
+      });
+    });
+  }
+
+  private seedCompanies() {
+    const companyData = [
+      {
+        name: "TechCorp Solutions",
+        userId: 1, // We'll create corresponding users later
+        location: "San Francisco, CA",
+        website: "https://techcorp.com",
+        description: "Leading technology solutions provider specializing in cloud computing and AI.",
+        logo: null
+      },
+      {
+        name: "Digital Innovations Inc",
+        userId: 2,
+        location: "New York, NY", 
+        website: "https://digitalinnovations.com",
+        description: "Innovative digital transformation company helping businesses modernize their operations.",
+        logo: null
+      },
+      {
+        name: "Global Finance Partners",
+        userId: 3,
+        location: "London, UK",
+        website: "https://globalfinance.com",
+        description: "Premier financial services firm providing investment and advisory solutions worldwide.",
+        logo: null
+      },
+      {
+        name: "HealthTech Solutions",
+        userId: 4,
+        location: "Boston, MA",
+        website: "https://healthtech.com", 
+        description: "Revolutionary healthcare technology company developing cutting-edge medical software.",
+        logo: null
+      },
+      {
+        name: "EcoGreen Industries",
+        userId: 5,
+        location: "Seattle, WA",
+        website: "https://ecogreen.com",
+        description: "Sustainable technology company focused on renewable energy and environmental solutions.",
+        logo: null
+      }
+    ];
+
+    companyData.forEach(company => {
+      const id = this.companyIdCounter++;
+      this.companiesData.set(id, {
+        id,
+        ...company
+      });
+    });
+  }
+
+  private seedResources() {
+    const resourceData = [
+      {
+        name: "GeeksforGeeks",
+        description: "A comprehensive platform for computer science education with programming tutorials, algorithms, and interview preparation.",
+        url: "https://www.geeksforgeeks.org",
+        category: "Programming Tutorials",
+        icon: "BookOpenIcon",
+        tags: ["programming", "algorithms", "data-structures", "interviews"]
+      },
+      {
+        name: "Stack Overflow",
+        description: "The largest online community for programmers to learn, share knowledge, and advance careers.",
+        url: "https://stackoverflow.com",
+        category: "Q&A Community",
+        icon: "MessageSquareIcon",
+        tags: ["programming", "community", "questions", "debugging"]
+      },
+      {
+        name: "LeetCode",
+        description: "Platform for coding interview preparation with thousands of programming challenges and solutions.",
+        url: "https://leetcode.com",
+        category: "Coding Practice",
+        icon: "CodeIcon",
+        tags: ["coding-interviews", "algorithms", "practice", "competitive-programming"]
+      },
+      {
+        name: "GitHub",
+        description: "World's largest platform for version control and collaboration, hosting millions of open source projects.",
+        url: "https://github.com",
+        category: "Version Control",
+        icon: "GitBranchIcon",
+        tags: ["git", "version-control", "open-source", "collaboration"]
+      },
+      {
+        name: "MDN Web Docs",
+        description: "Comprehensive documentation for web technologies including HTML, CSS, JavaScript, and web APIs.",
+        url: "https://developer.mozilla.org",
+        category: "Web Development",
+        icon: "GlobeIcon",
+        tags: ["web-development", "javascript", "html", "css", "documentation"]
+      },
+      {
+        name: "HackerRank",
+        description: "Coding challenges and competitions to improve programming skills and prepare for technical interviews.",
+        url: "https://www.hackerrank.com",
+        category: "Coding Practice",
+        icon: "TrophyIcon",
+        tags: ["coding-challenges", "programming", "competitions", "skill-development"]
+      },
+      {
+        name: "Coursera",
+        description: "Online learning platform offering courses from top universities and companies in technology and programming.",
+        url: "https://www.coursera.org",
+        category: "Online Learning",
+        icon: "GraduationCapIcon",
+        tags: ["online-courses", "education", "certificates", "university-courses"]
+      },
+      {
+        name: "freeCodeCamp",
+        description: "Free online coding bootcamp with interactive lessons, projects, and certifications in web development.",
+        url: "https://www.freecodecamp.org",
+        category: "Free Education",
+        icon: "AcademicCapIcon",
+        tags: ["free", "web-development", "certificates", "bootcamp", "projects"]
+      }
+    ];
+
+    resourceData.forEach(resource => {
+      const id = this.resourceIdCounter++;
+      this.resourcesData.set(id, {
+        id,
+        ...resource
       });
     });
   }
@@ -296,6 +435,11 @@ export class MemStorage implements IStorage {
   // Category management
   async getCategories(): Promise<Category[]> {
     return Array.from(this.categoriesData.values());
+  }
+
+  // Resource management
+  async getResources(): Promise<Resource[]> {
+    return Array.from(this.resourcesData.values());
   }
 }
 

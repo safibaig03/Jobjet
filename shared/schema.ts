@@ -117,3 +117,26 @@ export type Application = typeof applications.$inferSelect;
 export type InsertApplication = z.infer<typeof insertApplicationSchema>;
 
 export type Category = typeof categories.$inferSelect;
+
+// Learning resources
+export const resources = pgTable("resources", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  url: text("url").notNull(),
+  category: text("category").notNull(),
+  icon: text("icon"),
+  tags: text("tags").array(),
+});
+
+export const insertResourceSchema = createInsertSchema(resources).pick({
+  name: true,
+  description: true,
+  url: true,
+  category: true,
+  icon: true,
+  tags: true,
+});
+
+export type Resource = typeof resources.$inferSelect;
+export type InsertResource = z.infer<typeof insertResourceSchema>;
