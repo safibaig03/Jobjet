@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Redirect } from "wouter";
+import { Redirect, Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -111,7 +111,6 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       
       <main className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl w-full flex flex-col md:flex-row rounded-xl overflow-hidden shadow-xl">
@@ -179,6 +178,11 @@ export default function AuthPage() {
                           >
                             {loginMutation.isPending ? "Signing in..." : "Sign in"}
                           </Button>
+                          <div className="text-center mt-4">
+                            <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+                              Forgot your password?
+                            </Link>
+                          </div>
                         </form>
                       </Form>
                     </CardContent>
@@ -397,7 +401,6 @@ export default function AuthPage() {
         </div>
       </main>
       
-      <Footer />
     </div>
   );
 }

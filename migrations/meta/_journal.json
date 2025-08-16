@@ -1,0 +1,20 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1718380800000,
+      "tag": "0000_romantic_wrecking_crew",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1718380900000,
+      "tag": "0001_session_table",
+      "breakpoints": true
+    }
+  ]
+}

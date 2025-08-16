@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -125,7 +123,6 @@ export default function CompanyDashboard() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       
       <main className="flex-grow py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -398,7 +395,7 @@ export default function CompanyDashboard() {
         </div>
       </main>
       
-      <Footer />
+      
     </div>
   );
 }

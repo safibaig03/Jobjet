@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { useSearch } from "wouter";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
 import { JobCard } from "@/components/jobs/job-card";
 import { JobSearch } from "@/components/jobs/job-search";
 import { Button } from "@/components/ui/button";
@@ -32,6 +30,7 @@ export default function JobListings() {
   const searchParams = new URLSearchParams(search);
   const searchTerm = searchParams.get("search") || "";
   const locationTerm = searchParams.get("location") || "";
+  const companyId = searchParams.get("company") || "";
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   
   // Initialize filters from the URL
@@ -55,10 +54,14 @@ export default function JobListings() {
     if (locationTerm) {
       setFilter("location", locationTerm);
     }
+    if (companyId) {
+      // If company ID is provided, fetch jobs for that company directly
+      setFilter("company", companyId);
+    }
     
     // Apply filters initially to update filtered jobs
     applyFilters();
-  }, [searchTerm, locationTerm, setFilter, applyFilters]);
+  }, [searchTerm, locationTerm, companyId, setFilter, applyFilters]);
   
   // Fetch jobs with filters
   const queryString = Object.entries(filters)
@@ -98,7 +101,6 @@ export default function JobListings() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       
       <main className="flex-grow py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -308,7 +310,7 @@ export default function JobListings() {
         </div>
       </main>
       
-      <Footer />
+      
     </div>
   );
 }

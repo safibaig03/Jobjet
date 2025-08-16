@@ -8,8 +8,11 @@ import {
   insertCompanySchema, 
   insertApplicationSchema,
   jobTypeEnum, 
-  userRoleEnum
+  userRoleEnum,
+  jobs
 } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 // Middleware to check if user is authenticated
 const isAuthenticated = (req: Request, res: Response, next: Function) => {
@@ -39,7 +42,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Jobs API
   app.get("/api/jobs", async (req, res) => {
     try {
-      const { search, location, type, category } = req.query;
+      const { search, location, type, category, company } = req.query;
+      
+      // If company ID is provided, fetch jobs for that company directly
+      if (company) {
+        const companyId = parseInt(company as string);
+        const companyJobs = await db.select().from(jobs).where(eq(jobs.companyId, companyId));
+        return res.json(companyJobs);
+      }
+      
+      // Otherwise use the regular filtering
       const jobs = await storage.getJobs({
         search: search as string,
         location: location as string,
@@ -66,17 +78,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/jobs", isAuthenticated, hasRole(['company', 'admin']), async (req, res) => {
     try {
+      console.log('Job posting request body:', req.body);
+      console.log('User ID:', req.user!.id);
+      
+      // Get the company for this user
+      const company = await storage.getCompanyByUserId(req.user!.id);
+      if (!company) {
+        return res.status(400).json({ message: "Company profile not found for this user" });
+      }
+      
+      console.log('Company found:', company);
+      
       const jobData = insertJobSchema.parse({
         ...req.body,
         postedBy: req.user!.id,
+        companyId: company.id
       });
+      
+      console.log('Job data to be inserted:', jobData);
+      
       const job = await storage.createJob(jobData);
       res.status(201).json(job);
     } catch (error) {
+      console.error('Error creating job:', error);
       if (error instanceof z.ZodError) {
         res.status(400).json({ message: "Invalid job data", errors: error.errors });
       } else {
-        res.status(500).json({ message: "Failed to create job" });
+        res.status(500).json({ message: "Failed to create job", error: error.message });
       }
     }
   });
@@ -178,6 +206,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(categories);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch categories" });
+    }
+  });
+
+  // Company Jobs API
+  app.get("/api/companies/:id/jobs", async (req, res) => {
+    try {
+      const companyId = parseInt(req.params.id);
+      const companyJobs = await db.select().from(jobs).where(eq(jobs.companyId, companyId));
+      res.json(companyJobs);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch company jobs" });
     }
   });
 

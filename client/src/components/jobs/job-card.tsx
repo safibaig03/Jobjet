@@ -16,7 +16,7 @@ export function JobCard({ job }: JobCardProps) {
     part_time: "bg-blue-100 text-blue-800 hover:bg-blue-200",
     contract: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
     remote: "bg-indigo-100 text-indigo-800 hover:bg-indigo-200",
-    internship: "bg-purple-100 text-purple-800 hover:bg-purple-200",
+    internship: "bg-blue-100 text-blue-800 hover:bg-blue-200",
   };
 
   const getJobTypeLabel = (type: string): string => {

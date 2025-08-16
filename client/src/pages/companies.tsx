@@ -4,8 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLinkIcon, MapPinIcon, UsersIcon } from "lucide-react";
 import { Company } from "@shared/schema";
+import { useLocation } from "wouter";
 
 export default function Companies() {
+  const [, navigate] = useLocation();
   const { data: companies, isLoading } = useQuery<Company[]>({
     queryKey: ["/api/companies"],
   });
@@ -62,7 +64,10 @@ export default function Companies() {
               </div>
               
               <div className="mt-4 flex gap-2">
-                <Button className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground">
+                <Button 
+                  className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
+                  onClick={() => navigate(`/jobs?company=${company.id}`)}
+                >
                   View Jobs
                 </Button>
                 {company.website && (

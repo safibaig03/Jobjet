@@ -4,8 +4,6 @@ import { JobList } from "@/components/jobs/job-list";
 import { CategoryList } from "@/components/jobs/category-card";
 import { CompanyList } from "@/components/companies/company-card";
 import { Button } from "@/components/ui/button";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
 import { Link } from "wouter";
 import { Category, Company } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
@@ -25,7 +23,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       
       <main className="flex-grow">
         {/* Hero Section */}
@@ -118,7 +115,7 @@ export default function HomePage() {
                     </Button>
                   </Link>
                   <Link href="/jobs">
-                    <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
+                    <Button size="lg" variant="default" className="bg-white text-primary hover:bg-gray-100">
                       Browse Jobs
                     </Button>
                   </Link>
@@ -220,7 +217,6 @@ export default function HomePage() {
         )}
       </main>
       
-      <Footer />
     </div>
   );
 }

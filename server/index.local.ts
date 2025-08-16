@@ -56,11 +56,28 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // Modified to use only the port without specifying host for local development
-  const port = process.env.PORT || 5000;
-  server.listen(port, () => {
-    log(`serving on port ${port}`);
-  });
+  // Try to use port 5000, but fall back to another port if it's in use
+  const basePort = process.env.PORT || 5000;
+  let port = basePort;
+  let maxAttempts = 10;
+  
+  const startServer = () => {
+    try {
+      server.listen(port, () => {
+        log(`serving on port ${port}`);
+      });
+    } catch (err) {
+      if (err.code === 'EADDRINUSE' && maxAttempts > 0) {
+        log(`Port ${port} is in use, trying port ${port + 1}`);
+        port++;
+        maxAttempts--;
+        startServer();
+      } else {
+        log(`Failed to start server: ${err.message}`);
+        throw err;
+      }
+    }
+  };
+  
+  startServer();
 })();

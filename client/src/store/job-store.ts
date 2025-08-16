@@ -6,6 +6,7 @@ interface JobFilters {
   location?: string;
   jobType?: string;
   category?: string;
+  company?: string;
 }
 
 interface JobStore {
@@ -45,6 +46,7 @@ export const useJobStore = create<JobStore>((set, get) => ({
     location: '',
     jobType: '',
     category: '',
+    company: '',
   },
   
   // Actions

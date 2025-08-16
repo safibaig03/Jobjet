@@ -1,21 +1,47 @@
-import { useQuery } from "@tanstack/react-query";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
+import { useQuery, useQueries } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Application, Job } from "@shared/schema";
 import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/hooks/use-auth";
-import { Clock, CheckCircle, XCircle, Eye, FileText } from "lucide-react";
+import { Clock, CheckCircle, XCircle, Eye, FileText, Briefcase, MapPin } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { useState } from "react";
 
 export default function Applications() {
   const { user, isJobSeeker } = useAuth();
+  const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
 
   // Fetch user's applications
   const { data: applications, isLoading } = useQuery<Application[]>({
     queryKey: ["/api/applications"],
   });
+  
+  // Fetch job details for each application
+  const jobQueries = useQueries({
+    queries: (applications || []).map(application => ({
+      queryKey: [`/api/jobs/${application.jobId}`],
+      enabled: !!applications?.length,
+    })),
+  });
+  
+  // Create a map of job details by job ID
+  const jobsMap = jobQueries.reduce((acc, query, index) => {
+    if (query.data && applications?.[index]) {
+      acc[applications[index].jobId] = query.data as Job;
+    }
+    return acc;
+  }, {} as Record<number, Job>);
+  
+  // Check if all job queries are loading
+  const isJobsLoading = jobQueries.some(query => query.isLoading);
+  
+  // View application details
+  const handleViewApplication = (application: Application) => {
+    setSelectedApplication(application);
+  };
 
   // Helper functions
   const getStatusBadge = (status: string) => {
@@ -42,9 +68,7 @@ export default function Applications() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      
+    <div className="min-h-screen flex flex-col">      
       <main className="flex-grow py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold mb-2">My Applications</h1>
@@ -79,9 +103,21 @@ export default function Applications() {
                       {applications.map(application => (
                         <tr key={application.id} className="border-b hover:bg-muted/50">
                           <td className="px-4 py-4">
-                            {/* In a real app, you'd fetch the job title */}
-                            <div className="font-medium">Job ID: {application.jobId}</div>
-                            <div className="text-sm text-muted-foreground">
+                            {jobsMap[application.jobId] ? (
+                              <>
+                                <div className="font-medium">{jobsMap[application.jobId].title}</div>
+                                <div className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                                  <Briefcase className="h-3 w-3" />
+                                  <span>{jobsMap[application.jobId].jobType}</span>
+                                  <span className="mx-1">•</span>
+                                  <MapPin className="h-3 w-3" />
+                                  <span>{jobsMap[application.jobId].location}</span>
+                                </div>
+                              </>
+                            ) : (
+                              <div className="font-medium">Job ID: {application.jobId}</div>
+                            )}
+                            <div className="text-xs text-muted-foreground mt-1">
                               Application #{application.id}
                             </div>
                           </td>
@@ -92,15 +128,43 @@ export default function Applications() {
                             {getStatusBadge(application.status)}
                           </td>
                           <td className="px-4 py-4 text-right">
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="flex items-center gap-1"
-                              onClick={() => window.open(`/job/${application.jobId}`, '_blank')}
-                            >
-                              <Eye className="h-4 w-4" />
-                              <span className="hidden sm:inline">View Job</span>
-                            </Button>
+                            <div className="flex justify-end gap-2">
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button 
+                                      size="sm" 
+                                      variant="outline" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => handleViewApplication(application)}
+                                    >
+                                      <FileText className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>View Application</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button 
+                                      size="sm" 
+                                      variant="outline" 
+                                      className="h-8 w-8 p-0"
+                                      onClick={() => window.open(`/job/${application.jobId}`, '_blank')}
+                                    >
+                                      <Eye className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>View Job</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -128,7 +192,49 @@ export default function Applications() {
         </div>
       </main>
       
-      <Footer />
+      {/* Application Details Dialog */}
+      {selectedApplication && (
+        <Dialog open={!!selectedApplication} onOpenChange={(open) => !open && setSelectedApplication(null)}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Application Details</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div>
+                <h3 className="text-lg font-semibold mb-2">
+                  {jobsMap[selectedApplication.jobId]?.title || `Job ID: ${selectedApplication.jobId}`}
+                </h3>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+                  <Badge variant="outline">{getStatusBadge(selectedApplication.status)}</Badge>
+                  <span>•</span>
+                  <span>Submitted {formatDistanceToNow(new Date(selectedApplication.submittedAt), { addSuffix: true })}</span>
+                </div>
+              </div>
+              
+              <div className="border rounded-md p-4 bg-muted/30">
+                <h4 className="font-medium mb-2">Resume/CV</h4>
+                <div className="whitespace-pre-line text-sm">{selectedApplication.resume}</div>
+              </div>
+              
+              <div className="border rounded-md p-4 bg-muted/30">
+                <h4 className="font-medium mb-2">Cover Letter</h4>
+                <div className="whitespace-pre-line text-sm">{selectedApplication.coverLetter}</div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button 
+                variant="outline" 
+                onClick={() => window.open(`/job/${selectedApplication.jobId}`, '_blank')}
+                className="flex items-center gap-1"
+              >
+                <Eye className="h-4 w-4" />
+                View Job
+              </Button>
+              <Button onClick={() => setSelectedApplication(null)}>Close</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

@@ -28,6 +28,9 @@ async function comparePasswords(supplied: string, stored: string) {
   return timingSafeEqual(hashedBuf, suppliedBuf);
 }
 
+// Password reset tokens storage (in production, use database)
+const passwordResetTokens = new Map<string, { userId: number; expires: Date }>();
+
 export function setupAuth(app: Express) {
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "jobboard-secret",
@@ -108,8 +111,21 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/login", passport.authenticate("local"), (req, res) => {
-    res.status(200).json(req.user);
+  app.post("/api/login", (req, res, next) => {
+    passport.authenticate("local", (err, user, info) => {
+      if (err) {
+        return next(err);
+      }
+      if (!user) {
+        return res.status(401).json({ 
+          message: "Invalid username or password" 
+        });
+      }
+      req.login(user, (err) => {
+        if (err) return next(err);
+        res.status(200).json(user);
+      });
+    })(req, res, next);
   });
 
   app.post("/api/logout", (req, res, next) => {
@@ -119,8 +135,127 @@ export function setupAuth(app: Express) {
     });
   });
 
-  app.get("/api/user", (req, res) => {
+  app.get("/api/user", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    res.json(req.user);
+    
+    try {
+      let userData = req.user;
+      
+      // If user is a company, fetch company profile data
+      if (req.user?.role === 'company') {
+        const company = await storage.getCompanyByUserId(req.user.id);
+        if (company) {
+          userData = {
+            ...req.user,
+            company: company.name,
+            companyWebsite: company.website,
+            companyLogo: company.logo,
+            companyDescription: company.description,
+            companyLocation: company.location,
+          };
+        }
+      }
+      
+      res.json(userData);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      res.json(req.user); // Fallback to basic user data
+    }
+  });
+
+  app.delete("/api/user", async (req, res, next) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    
+    try {
+      const userId = req.user!.id;
+      
+      // Delete user and all associated data
+      await storage.deleteUser(userId);
+      
+      // Logout the user
+      req.logout((err) => {
+        if (err) return next(err);
+        res.status(200).json({ message: "Account deleted successfully" });
+      });
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      res.status(500).json({ message: "Failed to delete account" });
+    }
+  });
+
+  // Test endpoint
+  app.get("/api/test", (req, res) => {
+    res.json({ message: "Test endpoint working" });
+  });
+
+  // Forgot password endpoint
+  app.post("/api/forgot-password", async (req, res) => {
+    try {
+      console.log("Forgot password request body:", req.body);
+      const { email } = req.body;
+      
+      if (!email) {
+        console.log("No email provided in request");
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        // Don't reveal if email exists or not for security
+        return res.status(200).json({ message: "If an account with that email exists, a password reset link has been sent." });
+      }
+
+      // Generate reset token
+      const resetToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      const expires = new Date(Date.now() + 3600000); // 1 hour expiry
+      
+      passwordResetTokens.set(resetToken, { userId: user.id, expires });
+
+      // In production, send email here
+      console.log(`Password reset token for ${email}: ${resetToken}`);
+      console.log(`Reset link: http://localhost:5000/reset-password?token=${resetToken}`);
+
+      res.status(200).json({ message: "If an account with that email exists, a password reset link has been sent." });
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      res.status(500).json({ message: "Failed to process password reset request" });
+    }
+  });
+
+  // Reset password endpoint
+  app.post("/api/reset-password", async (req, res) => {
+    try {
+      const { token, newPassword } = req.body;
+      
+      if (!token || !newPassword) {
+        return res.status(400).json({ message: "Token and new password are required" });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: "Password must be at least 6 characters long" });
+      }
+
+      const resetData = passwordResetTokens.get(token);
+      if (!resetData) {
+        return res.status(400).json({ message: "Invalid or expired reset token" });
+      }
+
+      if (resetData.expires < new Date()) {
+        passwordResetTokens.delete(token);
+        return res.status(400).json({ message: "Reset token has expired" });
+      }
+
+      // Update user's password
+      const hashedPassword = await hashPassword(newPassword);
+      await storage.updateUserPassword(resetData.userId, hashedPassword);
+      
+      // Remove used token
+      passwordResetTokens.delete(token);
+
+      res.status(200).json({ message: "Password has been reset successfully" });
+    } catch (error) {
+      console.error("Reset password error:", error);
+      res.status(500).json({ message: "Failed to reset password" });
+    }
   });
 }

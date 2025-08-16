@@ -32,44 +32,47 @@ export function Navbar() {
   return (
     <nav className="bg-background sticky top-0 z-50 border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <div className="flex-shrink-0 flex items-center">
-              <Link href="/">
-                <span className="text-primary text-2xl font-bold cursor-pointer">JobJet</span>
-              </Link>
-            </div>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <Link href="/">
-                <span className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium cursor-pointer ${
-                  location === "/" 
-                    ? "border-primary text-foreground" 
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-                }`}>
-                  Find Jobs
-                </span>
-              </Link>
-              <Link href="/companies">
-                <span className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium cursor-pointer ${
-                  location === "/companies" 
-                    ? "border-primary text-foreground" 
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-                }`}>
-                  Companies
-                </span>
-              </Link>
-              <Link href="/resources">
-                <span className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium cursor-pointer ${
-                  location === "/resources" 
-                    ? "border-primary text-foreground" 
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-                }`}>
-                  Resources
-                </span>
-              </Link>
-            </div>
+        <div className="relative flex items-center justify-between h-16">
+          {/* Left: Logo */}
+          <div className="flex items-center flex-shrink-0">
+            <Link href="/">
+              <span className="text-primary text-2xl font-bold cursor-pointer">JobJet</span>
+            </Link>
           </div>
-          <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
+
+          {/* Center: Nav Links (desktop only) */}
+          <div className="hidden sm:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 space-x-8">
+            <Link href="/">
+              <span className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium cursor-pointer ${
+                location === "/"
+                  ? "border-primary text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+              }`}>
+                Find Jobs
+              </span>
+            </Link>
+            <Link href="/companies">
+              <span className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium cursor-pointer ${
+                location === "/companies"
+                  ? "border-primary text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+              }`}>
+                Companies
+              </span>
+            </Link>
+            <Link href="/resources">
+              <span className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium cursor-pointer ${
+                location === "/resources"
+                  ? "border-primary text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+              }`}>
+                Resources
+              </span>
+            </Link>
+          </div>
+
+          {/* Right: Theme toggle & Auth/User */}
+          <div className="flex items-center space-x-2 sm:space-x-4">
             <Button 
               variant="ghost" 
               size="icon"
@@ -78,7 +81,6 @@ export function Navbar() {
             >
               {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
-            
             {user ? (
               <>
                 {isCompany && (
@@ -86,7 +88,6 @@ export function Navbar() {
                     <Button className="bg-primary hover:bg-primary/90">Post a Job</Button>
                   </Link>
                 )}
-                
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Avatar className="h-8 w-8 cursor-pointer">
@@ -128,8 +129,8 @@ export function Navbar() {
               </>
             )}
           </div>
-          
-          {/* Mobile menu button */}
+
+          {/* Mobile: Hamburger menu */}
           <div className="flex items-center sm:hidden">
             <Button 
               variant="ghost" 
@@ -139,7 +140,6 @@ export function Navbar() {
             >
               {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
-            
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="ml-2">

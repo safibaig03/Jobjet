@@ -115,7 +115,6 @@ export default function PostJob() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       
       <main className="flex-grow py-10">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -289,7 +288,6 @@ export default function PostJob() {
         </div>
       </main>
       
-      <Footer />
     </div>
   );
 }

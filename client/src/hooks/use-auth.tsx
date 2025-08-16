@@ -48,9 +48,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     },
     onError: (error: Error) => {
+      // Extract user-friendly message from error
+      let message = "Invalid username or password";
+      if (error.message.includes("Invalid username or password")) {
+        message = "Invalid username or password. Please check your credentials and try again.";
+      } else if (error.message.includes("401:")) {
+        // Extract message from JSON response
+        try {
+          const errorData = JSON.parse(error.message.split("401: ")[1]);
+          if (errorData.message) {
+            message = errorData.message;
+          }
+        } catch {
+          message = "Login failed. Please try again.";
+        }
+      }
+      
       toast({
         title: "Login failed",
-        description: error.message || "Invalid username or password",
+        description: message,
         variant: "destructive",
       });
     },
@@ -69,9 +85,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     },
     onError: (error: Error) => {
+      // Extract user-friendly message from error
+      let message = "Could not create account";
+      if (error.message.includes("Username already exists")) {
+        message = "Username already exists. Please choose a different username.";
+      } else if (error.message.includes("Email already exists")) {
+        message = "Email already exists. Please use a different email address.";
+      } else if (error.message.includes("400:")) {
+        // Extract message from JSON response
+        try {
+          const errorData = JSON.parse(error.message.split("400: ")[1]);
+          if (errorData.message) {
+            message = errorData.message;
+          }
+        } catch {
+          message = "Could not create account. Please try again.";
+        }
+      }
+      
       toast({
         title: "Registration failed",
-        description: error.message || "Could not create account",
+        description: message,
         variant: "destructive",
       });
     },
@@ -92,7 +126,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       toast({
         title: "Logout failed",
         description: error.message,
-        variant: "destructive",
       });
     },
   });

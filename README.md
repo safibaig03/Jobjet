@@ -1,55 +1,12 @@
 # JobJet
 
-A comprehensive full-stack job board platform built with React, Express.js, and in-memory storage. Features role-based authentication, job posting/browsing, company profiles, and learning resources.
-
-## 🚀 Features
-
-### Core Functionality
-- **User Authentication**: Secure registration/login with role-based access (Job Seeker, Company, Admin)
-- **Job Management**: Companies can post, edit, and manage job listings
-- **Job Applications**: Job seekers can browse and apply to jobs
-- **Company Profiles**: Detailed company pages with job listings and information
-- **Learning Resources**: Curated educational resources for career development
-- **Search & Filtering**: Advanced job search capabilities
-- **Responsive Design**: Mobile-first design that works on all devices
-
-### User Roles
-- **Job Seekers**: Browse jobs, apply to positions, manage applications
-- **Companies**: Post jobs, manage listings, view applications
-- **Admin**: Platform management and oversight
-
-## 🛠️ Tech Stack
-
-### Frontend
-- **React 18** with TypeScript
-- **Tailwind CSS** for styling
-- **Shadcn/ui** components
-- **Wouter** for client-side routing
-- **TanStack Query** for data fetching
-- **React Hook Form** with Zod validation
-- **Framer Motion** for animations
-
-### Backend
-- **Express.js** with TypeScript
-- **Passport.js** for authentication
-- **Session-based authentication** with express-session
-- **In-memory storage** (MemoryStore) for development
-- **Zod** for schema validation
-- **crypto.scrypt** for password hashing
-
-### Development Tools
-- **Vite** for development server and build
-- **TypeScript** for type safety
-- **ESBuild** for production builds
-- **Drizzle ORM** schema definitions (ready for database migration)
+A modern full-stack job board platform built with React, Express.js, and PostgreSQL. Features job seeker and recruiter (company) roles, job posting/browsing, company profiles, learning resources, and a consistent, mobile-friendly UI/UX.
 
 ## 📋 Prerequisites
 
-Before running this application locally, ensure you have:
-
-- **Node.js** (version 18 or higher)
-- **npm** (version 8 or higher)
-- **Git** for cloning the repository
+- Node.js 18+ and npm 8+
+- Git repository with your JobJet code
+- Neon Postgres database account (already set up in your .env file)
 
 ## 🚀 Local Setup Instructions
 
@@ -64,13 +21,11 @@ cd jobjet
 npm install
 ```
 
-### 3. Environment Setup (Optional)
+### 3. Environment Setup
 Create a `.env` file in the root directory for custom configuration:
 ```env
-# Optional: Custom session secret (defaults to 'jobboard-secret')
+DATABASE_URL=your-neon-postgres-url
 SESSION_SECRET=your-custom-session-secret
-
-# Optional: Custom port (defaults to 5000)
 PORT=5000
 ```
 
@@ -79,292 +34,250 @@ PORT=5000
 npm run dev
 ```
 
-**Important**: Use this command instead of `npm start` for local development.
-
 The application will be available at: **http://localhost:5000**
 
-### 5. Alternative Local Run Command
-If you encounter any issues with the development server, you can also run:
+## 🛠️ How It Works
+
+### System Architecture
+
+#### Frontend Architecture
+- **React 18** with TypeScript for type safety
+- **Component-based design** using Shadcn/ui for consistent UI components
+- **Client-side routing** with Wouter for lightweight navigation
+- **State management** using Zustand for job filtering and search state
+- **Data fetching** with TanStack Query for efficient server state management
+- **Form handling** with React Hook Form and Zod validation
+- **Styling** with Tailwind CSS and custom theme system
+
+#### Backend Architecture
+- **Express.js** server with TypeScript for API endpoints
+- **Session-based authentication** using Passport.js with LocalStrategy
+- **PostgreSQL database** with Drizzle ORM for data persistence
+- **RESTful API design** with proper HTTP status codes and error handling
+- **Schema validation** using Zod for request/response validation
+- **Role-based access control** with user types: job_seeker, company, admin
+
+### Authentication System
+
+The application uses built-in authentication with session-based management:
+
+- **Session-based authentication** using Passport.js (Local Strategy)
+- **Password hashing** with crypto.scrypt for security
+- **Role-based access control** (Job Seeker, Company)
+- **Protected routes** for authenticated users
+- **Automatic company profile creation** for company users
+- **Forgot Password** functionality with secure token-based reset
+
+Authentication routes are defined in `server/auth.ts` and include:
+
+```typescript
+// Authentication endpoints
+app.post("/api/register", async (req, res) => { /* User registration logic */ });
+app.post("/api/login", passport.authenticate("local"), (req, res) => { /* Login logic */ });
+app.post("/api/logout", (req, res) => { /* Logout logic */ });
+app.get("/api/user", (req, res) => { /* Get current user logic */ });
+app.post("/api/forgot-password", async (req, res) => { /* Password reset request logic */ });
+app.post("/api/reset-password", async (req, res) => { /* Password reset logic */ });
+```
+
+### API Routes and Functions
+
+The application provides a comprehensive set of API endpoints defined in `server/routes.ts`:
+
+#### Jobs API
+
+```typescript
+// Get all jobs with optional filtering
+app.get("/api/jobs", async (req, res) => { /* Get jobs with filtering logic */ });
+
+// Get job by ID
+app.get("/api/jobs/:id", async (req, res) => { /* Get job details logic */ });
+
+// Create new job (company role only)
+app.post("/api/jobs", isAuthenticated, hasRole(['company', 'admin']), async (req, res) => { /* Create job logic */ });
+
+// Update job (company role only)
+app.put("/api/jobs/:id", isAuthenticated, hasRole(['company', 'admin']), async (req, res) => { /* Update job logic */ });
+
+// Delete job (company role only)
+app.delete("/api/jobs/:id", isAuthenticated, hasRole(['company', 'admin']), async (req, res) => { /* Delete job logic */ });
+```
+
+#### Companies API
+
+```typescript
+// Get all companies
+app.get("/api/companies", async (req, res) => { /* Get companies logic */ });
+
+// Get company by ID
+app.get("/api/companies/:id", async (req, res) => { /* Get company details logic */ });
+
+// Update company (company role only)
+app.put("/api/companies/:id", isAuthenticated, hasRole(['company', 'admin']), async (req, res) => { /* Update company logic */ });
+```
+
+#### Applications API
+
+```typescript
+// Apply to job (job seeker role only)
+app.post("/api/jobs/:id/apply", isAuthenticated, hasRole(['job_seeker']), async (req, res) => { /* Apply to job logic */ });
+
+// Get applications for a job (company role only)
+app.get("/api/jobs/:id/applications", isAuthenticated, hasRole(['company', 'admin']), async (req, res) => { /* Get applications logic */ });
+
+// Get user's applications (job seeker role only)
+app.get("/api/applications", isAuthenticated, hasRole(['job_seeker']), async (req, res) => { /* Get user applications logic */ });
+```
+
+#### Resources API
+
+```typescript
+// Get learning resources
+app.get("/api/resources", async (req, res) => { /* Get resources logic */ });
+```
+
+### Database Schema
+
+The application uses Drizzle ORM with PostgreSQL. Key tables include:
+
+- **users**: User accounts with authentication details
+- **companies**: Company profiles linked to company user accounts
+- **jobs**: Job listings with details and requirements
+- **applications**: Job applications linking users to jobs
+- **categories**: Job categories for classification
+- **resources**: Learning resources for career development
+- **session**: Session storage for authentication
+
+### Middleware
+
+The application uses several middleware functions for authentication and authorization:
+
+```typescript
+// Check if user is authenticated
+const isAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.status(401).json({ message: "Unauthorized" });
+};
+
+// Check if user has a specific role
+const hasRole = (roles) => (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  
+  if (roles.includes(req.user.role)) {
+    return next();
+  }
+  
+  res.status(403).json({ message: "Forbidden" });
+};
+```
+
+## 🚀 Deployment Options
+
+### Option 1: Render
+
+1. Create a new Web Service on Render
+2. Connect your Git repository
+3. Configure the service:
+   - **Build Command**: `npm install && npm run build`
+   - **Start Command**: `npm start`
+   - **Environment Variables**: Add your `DATABASE_URL` and `SESSION_SECRET`
+
+### Option 2: Heroku
+
+1. Create a new Heroku app
+2. Connect your Git repository
+3. Add the Heroku Postgres add-on or use your existing Neon Postgres database
+4. Set environment variables in Heroku dashboard:
+   - `DATABASE_URL` (if not using Heroku Postgres)
+   - `SESSION_SECRET`
+5. Deploy using Git:
+
 ```bash
-node -r tsx/esm server/index.ts
+# Login to Heroku
+heroku login
+
+# Add Heroku remote
+heroku git:remote -a your-app-name
+
+# Push to Heroku
+git push heroku main
 ```
 
-## 📁 Project Structure
+### Option 3: Vercel
 
+1. Install Vercel CLI: `npm i -g vercel`
+2. Login to Vercel: `vercel login`
+3. Deploy: `vercel`
+4. Set environment variables in Vercel dashboard:
+   - `DATABASE_URL`
+   - `SESSION_SECRET`
+
+### Option 4: Railway
+
+1. Create a new project on Railway
+2. Connect your Git repository
+3. Add a PostgreSQL database service or use your existing Neon Postgres
+4. Set environment variables:
+   - `DATABASE_URL` (if not using Railway PostgreSQL)
+   - `SESSION_SECRET`
+5. Deploy using the Railway dashboard
+
+## 📊 Database Considerations
+
+### Using Neon Postgres
+
+Your application is already configured to use Neon Postgres. Make sure your database URL is correctly set in the environment variables of your hosting platform.
+
+### Running Migrations
+
+After deploying, you may need to run database migrations:
+
+```bash
+# For Heroku
+heroku run npm run db:push
+
+# For other platforms, access the shell and run
+npm run db:push
 ```
-jobjet/
-├── client/                 # Frontend React application
-│   ├── src/
-│   │   ├── components/     # Reusable UI components
-│   │   │   ├── ui/         # Shadcn/ui components
-│   │   │   ├── layout/     # Layout components (Navbar, Footer)
-│   │   │   ├── jobs/       # Job-related components
-│   │   │   └── companies/  # Company-related components
-│   │   ├── pages/          # Page components
-│   │   │   ├── home-page.tsx
-│   │   │   ├── auth-page.tsx
-│   │   │   ├── job-listings.tsx
-│   │   │   ├── companies.tsx
-│   │   │   ├── resources.tsx
-│   │   │   └── ...
-│   │   ├── hooks/          # Custom React hooks
-│   │   ├── lib/            # Utility functions and configurations
-│   │   ├── store/          # Zustand stores
-│   │   ├── App.tsx         # Main App component
-│   │   └── main.tsx        # React entry point
-│   └── index.html          # HTML template
-├── server/                 # Backend Express application
-│   ├── index.ts            # Server entry point
-│   ├── routes.ts           # API routes
-│   ├── auth.ts             # Authentication setup
-│   ├── storage.ts          # In-memory storage implementation
-│   └── vite.ts             # Vite integration
-├── shared/                 # Shared types and schemas
-│   └── schema.ts           # Database schemas and types
-├── package.json            # Dependencies and scripts
-├── vite.config.ts          # Vite configuration
-├── tailwind.config.ts      # Tailwind CSS configuration
-├── tsconfig.json           # TypeScript configuration
-└── README.md               # This file
-```
+
+## 🔧 Troubleshooting
+
+### Connection Issues
+
+If you encounter database connection issues:
+
+1. Verify your `DATABASE_URL` is correctly set
+2. Ensure your database allows connections from your hosting provider's IP addresses
+3. Check if SSL is required (Neon Postgres requires SSL)
+
+### Session Store Issues
+
+If sessions aren't persisting:
+
+1. Verify the session table exists in your database
+2. Check that `SESSION_SECRET` is set correctly
+
+## 🔍 Production Considerations
+
+1. Set `NODE_ENV=production` in your environment variables
+2. Consider adding a custom domain
+3. Set up HTTPS (most platforms handle this automatically)
+4. Configure proper logging and monitoring
 
 ## 🔧 Available Scripts
 
 ```bash
-# Development
 npm run dev          # Start development server (RECOMMENDED)
-
-# Building
 npm run build        # Build for production
 npm run start        # Start production server
-
-# Type Checking
 npm run check        # TypeScript type checking
-
-# Database (when using PostgreSQL)
 npm run db:push      # Push schema changes to database
 ```
 
-## 🎨 Design System
+## 🤝 Support
 
-The application uses a consistent purple theme throughout:
-- **Primary Color**: `hsl(238 77% 64%)` (Purple)
-- **Design System**: Shadcn/ui components with Tailwind CSS
-- **Theme**: Professional variant with light appearance
-- **Typography**: Inter font family
-- **Icons**: Lucide React icons
-
-## 🔐 Authentication System
-
-### No External Services Required
-This application uses **built-in authentication** - no Clerk, Auth0, or other external services needed.
-
-### Features
-- **Session-based authentication** using Passport.js
-- **Password hashing** with crypto.scrypt
-- **Role-based access control**
-- **Protected routes** for authenticated users
-- **Automatic company profile creation** for company users
-
-### Available Endpoints
-```
-POST /api/register    # User registration
-POST /api/login       # User login
-POST /api/logout      # User logout
-GET  /api/user        # Get current user
-```
-
-## 💾 Data Storage
-
-Currently uses **in-memory storage** for development simplicity:
-- **MemoryStore** for session storage
-- **JavaScript objects** for data persistence
-- **Sample data** pre-loaded for demonstration
-- **No database setup required** for local development
-
-### Sample Data Included
-- **5 Companies**: TechCorp Solutions, Digital Innovations Inc, Global Finance Partners, HealthTech Solutions, EcoGreen Industries
-- **8 Learning Resources**: GeeksforGeeks, LeetCode, Stack Overflow, GitHub, Coursera, edX, Udemy, FreeCodeCamp
-- **Job Categories**: Software Development, Data Science, Marketing, Design, etc.
-
-## 🌐 API Endpoints
-
-### Users & Authentication
-- `POST /api/register` - User registration
-- `POST /api/login` - User login
-- `POST /api/logout` - User logout
-- `GET /api/user` - Get current user
-
-### Jobs
-- `GET /api/jobs` - Get all jobs
-- `POST /api/jobs` - Create new job (company only)
-- `GET /api/jobs/:id` - Get job by ID
-- `PUT /api/jobs/:id` - Update job (company only)
-- `DELETE /api/jobs/:id` - Delete job (company only)
-
-### Companies
-- `GET /api/companies` - Get all companies
-- `GET /api/companies/:id` - Get company by ID
-
-### Applications
-- `GET /api/applications` - Get user's applications
-- `POST /api/applications` - Submit job application
-
-### Categories & Resources
-- `GET /api/categories` - Get job categories
-- `GET /api/resources` - Get learning resources
-
-## 🎯 Key Features Implemented
-
-### ✅ Authentication & Authorization
-- User registration/login with validation
-- Role-based access control (Job Seeker, Company, Admin)
-- Session management
-- Protected routes
-
-### ✅ Job Management
-- Job posting for companies
-- Job browsing for job seekers
-- Job search and filtering
-- Application submission
-
-### ✅ Company Features
-- Company profile creation during registration
-- Company job listings
-- Company information display
-- 5 sample companies included
-
-### ✅ User Experience
-- Responsive design
-- Loading states
-- Error handling
-- Form validation
-- Consistent purple theme
-- Mobile-first design
-
-### ✅ Learning Resources
-- 8 curated learning platforms
-- Categorized resources (Programming Tutorials, Q&A Community, Coding Practice, Learning Platforms)
-- External links to educational content
-
-## 🚀 Running in Production
-
-### Build the Application
-```bash
-npm run build
-```
-
-### Start Production Server
-```bash
-npm start
-```
-
-### Environment Variables for Production
-```env
-NODE_ENV=production
-SESSION_SECRET=your-secure-session-secret
-PORT=5000
-```
-
-## 🔄 Migration to Database
-
-The codebase is ready for database migration:
-
-1. **Schema is defined** in `shared/schema.ts` using Drizzle ORM
-2. **Storage interface** in `server/storage.ts` can be swapped
-3. **Drizzle configuration** ready in `drizzle.config.ts`
-
-To migrate to PostgreSQL:
-1. Set up PostgreSQL database
-2. Configure `DATABASE_URL` environment variable
-3. Replace `MemStorage` with `DbStorage` in `server/storage.ts`
-4. Run `npm run db:push` to create tables
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-1. **Port already in use**
-   ```bash
-   # Kill process on port 5000 (macOS/Linux)
-   lsof -ti:5000 | xargs kill -9
-   
-   # Windows
-   netstat -ano | findstr :5000
-   taskkill /PID <PID> /F
-   ```
-
-2. **Dependencies issues**
-   ```bash
-   # Clear npm cache and reinstall
-   rm -rf node_modules package-lock.json
-   npm install
-   ```
-
-3. **TypeScript errors**
-   ```bash
-   # Run type checking
-   npm run check
-   ```
-
-4. **Server not starting**
-   - Make sure you're using `npm run dev` for development
-   - Check if port 5000 is available
-   - Try the alternative command: `node -r tsx/esm server/index.ts`
-
-## 📱 Testing the Application
-
-### Sample User Accounts
-You can register new accounts with these roles:
-- **Job Seeker**: Select "Find a job" during registration
-- **Company**: Select "Hire talent" during registration
-
-### Testing Features
-1. **Registration**: Create accounts for both job seekers and companies
-2. **Job Posting**: Login as a company and post new jobs
-3. **Job Application**: Login as a job seeker and apply to jobs
-4. **Company Browsing**: Visit `/companies` to see all registered companies
-5. **Learning Resources**: Visit `/resources` to explore educational content
-
-## 🎨 Customization
-
-### Changing the Theme
-Edit `theme.json` to customize colors:
-```json
-{
-  "variant": "professional",
-  "primary": "hsl(238 77% 64%)",
-  "appearance": "light",
-  "radius": 0.5
-}
-```
-
-### Adding New Pages
-1. Create new page component in `client/src/pages/`
-2. Add route in `client/src/App.tsx`
-3. Update navigation in `client/src/components/layout/navbar.tsx`
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch: `git checkout -b feature/new-feature`
-3. Commit changes: `git commit -am 'Add new feature'`
-4. Push to branch: `git push origin feature/new-feature`
-5. Submit pull request
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 🔗 Additional Resources
-
-- [React Documentation](https://react.dev/)
-- [Express.js Guide](https://expressjs.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Shadcn/ui Components](https://ui.shadcn.com/)
-- [Drizzle ORM](https://orm.drizzle.team/)
-- [Passport.js](http://www.passportjs.org/)
-
----
-
-**Note**: This application uses in-memory storage for development simplicity. No external database or authentication services required. For production deployment, consider migrating to a persistent database like PostgreSQL.
+If you encounter issues during deployment, refer to your hosting platform's documentation or support channels.

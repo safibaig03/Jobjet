@@ -1,9 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -36,6 +38,12 @@ export default function JobDetails() {
     queryKey: [`/api/jobs/${jobId}`],
   });
 
+  // State for application form
+  const [showApplicationForm, setShowApplicationForm] = useState(false);
+  const [resume, setResume] = useState("");
+  const [aboutYourself, setAboutYourself] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // Apply for job mutation
   const handleApply = async () => {
     if (!user) {
@@ -43,12 +51,21 @@ export default function JobDetails() {
       return;
     }
 
+    // Show application form instead of submitting immediately
+    setShowApplicationForm(true);
+  };
+
+  // Handle application form submission
+  const handleSubmitApplication = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
     try {
       const applicationData = {
         jobId,
-        userId: user.id,
-        resume: "Uploaded resume", // In a real app, this would be a file upload
-        coverLetter: "Cover letter content" // In a real app, this would be user input
+        userId: user!.id,
+        resume,
+        coverLetter: aboutYourself
       };
 
       await apiRequest("POST", `/api/jobs/${jobId}/apply`, applicationData);
@@ -57,13 +74,27 @@ export default function JobDetails() {
         title: "Application submitted",
         description: "Your application has been submitted successfully.",
       });
+
+      // Reset form and hide it
+      setShowApplicationForm(false);
+      setResume("");
+      setAboutYourself("");
     } catch (error) {
       toast({
         title: "Application failed",
         description: "Failed to submit your application. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  // Close application form
+  const handleCancelApplication = () => {
+    setShowApplicationForm(false);
+    setResume("");
+    setAboutYourself("");
   };
 
   useEffect(() => {
@@ -102,11 +133,9 @@ export default function JobDetails() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Navbar />
         <main className="flex-grow flex items-center justify-center p-6">
           <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -114,7 +143,6 @@ export default function JobDetails() {
   if (error || !job) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Navbar />
         <main className="flex-grow p-6">
           <div className="max-w-4xl mx-auto bg-red-50 dark:bg-red-900/20 p-6 rounded-lg border border-red-200 dark:border-red-800 text-center">
             <h2 className="text-2xl font-bold text-red-700 dark:text-red-400 mb-2">Job Not Found</h2>
@@ -125,14 +153,12 @@ export default function JobDetails() {
             </Button>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       
       <main className="flex-grow py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -186,6 +212,56 @@ export default function JobDetails() {
                   </Button>
                 </div>
               )}
+              
+              {/* Application Form Dialog */}
+              <Dialog open={showApplicationForm} onOpenChange={setShowApplicationForm}>
+                <DialogContent className="sm:max-w-[500px]">
+                  <DialogHeader>
+                    <DialogTitle>Apply for {job.title}</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleSubmitApplication}>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="resume">Resume</Label>
+                        <Textarea
+                          id="resume"
+                          placeholder="Paste your resume here"
+                          value={resume}
+                          onChange={(e) => setResume(e.target.value)}
+                          className="min-h-[100px]"
+                          required
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="aboutYourself">About Yourself</Label>
+                        <Textarea
+                          id="aboutYourself"
+                          placeholder="Tell us about yourself and why you're interested in this position"
+                          value={aboutYourself}
+                          onChange={(e) => setAboutYourself(e.target.value)}
+                          className="min-h-[150px]"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button type="button" variant="outline" onClick={handleCancelApplication} disabled={isSubmitting}>
+                        Cancel
+                      </Button>
+                      <Button type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? (
+                          <>
+                            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent"></div>
+                            Submitting...
+                          </>
+                        ) : (
+                          "Submit Application"
+                        )}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
           
@@ -324,7 +400,6 @@ export default function JobDetails() {
         </div>
       </main>
       
-      <Footer />
     </div>
   );
 }

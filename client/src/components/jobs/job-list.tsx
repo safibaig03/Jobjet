@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Job } from "@shared/schema";
 import { useJobStore } from "@/store/job-store";
 import { useEffect } from "react";
+import { Link } from "wouter";
 
 interface JobListProps {
   title?: string;
@@ -78,9 +79,9 @@ export function JobList({
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">{title}</h2>
         {showViewAll && (
-          <a href="/jobs" className="text-primary hover:text-primary/90 font-medium">
+          <Link href="/jobs" className="text-primary hover:text-primary/90 font-medium">
             View all jobs →
-          </a>
+          </Link>
         )}
       </div>
       
