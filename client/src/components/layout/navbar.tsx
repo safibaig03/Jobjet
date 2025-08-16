@@ -36,7 +36,7 @@ export function Navbar() {
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link href="/">
-                <span className="text-primary text-2xl font-bold cursor-pointer">JobBoard</span>
+                <span className="text-primary text-2xl font-bold cursor-pointer">JobJet</span>
               </Link>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">

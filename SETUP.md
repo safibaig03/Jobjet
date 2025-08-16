@@ -1,4 +1,4 @@
-# Quick Setup Guide
+# JobJet - Quick Setup Guide
 
 ## Prerequisites
 - Node.js 18+
@@ -7,7 +7,7 @@
 ## Installation
 ```bash
 # 1. Extract/clone the project
-cd job-board-platform
+cd jobjet
 
 # 2. Install dependencies
 npm install

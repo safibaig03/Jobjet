@@ -362,9 +362,9 @@ export default function AuthPage() {
           {/* Right side - Hero/Branding section */}
           <div className="w-full md:w-1/2 bg-primary p-8 flex items-center justify-center">
             <div className="max-w-md text-white">
-              <h1 className="text-4xl font-bold mb-4">Welcome to JobBoard</h1>
+              <h1 className="text-4xl font-bold mb-4">Welcome to JobJet</h1>
               <p className="text-lg mb-6">
-                The easiest way to find your dream job or hire top talent. Join thousands of companies and job seekers who trust JobBoard.
+                The easiest way to find your dream job or hire top talent. Join thousands of companies and job seekers who trust JobJet.
               </p>
               <div className="space-y-4">
                 <div className="flex items-center">

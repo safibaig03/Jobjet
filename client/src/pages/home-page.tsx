@@ -109,7 +109,7 @@ export default function HomePage() {
                   <span className="block">Create your profile today.</span>
                 </h2>
                 <p className="mt-4 text-lg leading-6 text-primary-100">
-                  Join thousands of job seekers who have found their next opportunity through JobBoard. Create your profile, upload your resume, and get matched with the perfect job.
+                  Join thousands of job seekers who have found their next opportunity through JobJet. Create your profile, upload your resume, and get matched with the perfect job.
                 </p>
                 <div className="mt-8 flex flex-col sm:flex-row gap-4">
                   <Link href="/auth">

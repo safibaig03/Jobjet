@@ -132,7 +132,7 @@ export function Footer() {
           </div>
           <div className="mt-8 md:mt-0 md:order-1">
             <p className="text-center text-base text-slate-400">
-              &copy; {new Date().getFullYear()} JobBoard, Inc. All rights reserved.
+              &copy; {new Date().getFullYear()} JobJet, Inc. All rights reserved.
             </p>
           </div>
         </div>

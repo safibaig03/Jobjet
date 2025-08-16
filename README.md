@@ -1,6 +1,6 @@
-# Job Board Platform
+# JobJet
 
-A comprehensive full-stack Job Board Platform built with React, Express.js, and in-memory storage. Features role-based authentication, job posting/browsing, company profiles, and learning resources.
+A comprehensive full-stack job board platform built with React, Express.js, and in-memory storage. Features role-based authentication, job posting/browsing, company profiles, and learning resources.
 
 ## 🚀 Features
 
@@ -56,7 +56,7 @@ Before running this application locally, ensure you have:
 ### 1. Clone or Download the Repository
 ```bash
 git clone <repository-url>
-cd job-board-platform
+cd jobjet
 ```
 
 ### 2. Install Dependencies
@@ -92,7 +92,7 @@ node -r tsx/esm server/index.ts
 ## 📁 Project Structure
 
 ```
-job-board-platform/
+jobjet/
 ├── client/                 # Frontend React application
 │   ├── src/
 │   │   ├── components/     # Reusable UI components
