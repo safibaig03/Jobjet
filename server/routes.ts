@@ -39,11 +39,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes
   setupAuth(app);
 
-  // Health check endpoint for Render
-  app.get("/api/health", (req, res) => {
-    res.status(200).json({ status: "ok", message: "Server is running" });
-  });
-
   // Jobs API
   app.get("/api/jobs", async (req, res) => {
     try {
