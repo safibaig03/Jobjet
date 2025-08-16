@@ -66,10 +66,13 @@ export function JobList({
       ));
   };
 
+  // Don't show error message on home page, just show empty state
   if (error) {
     return (
-      <div className="text-center py-8">
-        <p className="text-destructive">Error loading jobs. Please try again later.</p>
+      <div className="py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {renderSkeletons()}
+        </div>
       </div>
     );
   }
