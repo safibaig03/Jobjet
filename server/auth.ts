@@ -77,39 +77,67 @@ export function setupAuth(app: Express) {
 
   app.post("/api/register", async (req, res, next) => {
     try {
+      console.log('Registration request body:', JSON.stringify(req.body));
+      
+      // Validate required fields
+      if (!req.body.username || !req.body.password || !req.body.email || !req.body.name) {
+        console.log('Missing required fields in registration request');
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
       const existingUser = await storage.getUserByUsername(req.body.username);
       if (existingUser) {
+        console.log('Username already exists:', req.body.username);
         return res.status(400).json({ message: "Username already exists" });
       }
 
       // Check if email already exists
       const existingEmail = await storage.getUserByEmail(req.body.email);
       if (existingEmail) {
+        console.log('Email already exists:', req.body.email);
         return res.status(400).json({ message: "Email already exists" });
       }
 
-      const user = await storage.createUser({
-        ...req.body,
-        password: await hashPassword(req.body.password),
-      });
-
-      // If user is a company, create a company profile
-      if (req.body.role === 'company') {
-        await storage.createCompany({
-          userId: user.id,
-          name: req.body.name,
-          website: req.body.website || '',
-          logo: req.body.logo || '',
-          description: req.body.description || '',
-          location: req.body.location || '',
+      try {
+        const user = await storage.createUser({
+          ...req.body,
+          password: await hashPassword(req.body.password),
         });
-      }
 
-      req.login(user, (err) => {
-        if (err) return next(err);
-        res.status(201).json(user);
-      });
+        console.log('User created successfully:', user.id);
+
+        // If user is a company, create a company profile
+        if (req.body.role === 'company') {
+          try {
+            await storage.createCompany({
+              userId: user.id,
+              name: req.body.name,
+              website: req.body.website || '',
+              logo: req.body.logo || '',
+              description: req.body.description || '',
+              location: req.body.location || '',
+            });
+            console.log('Company profile created for user:', user.id);
+          } catch (companyError) {
+            console.error('Error creating company profile:', companyError);
+            // Continue with login even if company profile creation fails
+          }
+        }
+
+        req.login(user, (err) => {
+          if (err) {
+            console.error('Login error after registration:', err);
+            return next(err);
+          }
+          console.log('User logged in after registration:', user.id);
+          res.status(201).json(user);
+        });
+      } catch (dbError) {
+        console.error('Database error during user creation:', dbError);
+        return res.status(500).json({ message: "Could not create account", error: dbError.message });
+      }
     } catch (error) {
+      console.error('Unexpected error during registration:', error);
       next(error);
     }
   });

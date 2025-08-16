@@ -18,7 +18,14 @@ export default function handler(req, res) {
   // Parse request body if it's a POST request
   let body;
   if (req.method !== 'GET' && req.method !== 'HEAD') {
-    body = req.body;
+    body = JSON.stringify(req.body);
+    // Update content-type header for JSON requests
+    headers['content-type'] = 'application/json';
+  }
+  
+  console.log(`Proxying ${req.method} request to ${serverUrl}${req.url}`);
+  if (req.method !== 'GET' && req.method !== 'HEAD') {
+    console.log('Request body:', JSON.stringify(req.body));
   }
   
   // Proxy the request to the backend
@@ -72,6 +79,17 @@ export default function handler(req, res) {
     })
     .catch(error => {
       console.error('API proxy error:', error);
-      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+      // Log more details about the request that failed
+      console.error('Failed request details:', {
+        method: req.method,
+        url: req.url,
+        headers: req.headers,
+        body: req.body
+      });
+      res.status(500).json({ 
+        error: 'Internal Server Error', 
+        message: 'Could not create account. Please try again later.',
+        details: error.message 
+      });
     });
 }

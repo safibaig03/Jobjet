@@ -2,9 +2,22 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import dotenv from "dotenv";
+import cors from "cors";
 dotenv.config({ path: ".env" });
 
 const app = express();
+
+// Configure CORS for Vercel deployment
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? [process.env.SERVER_URL || 'https://jobjet-seven.vercel.app', 'https://jobjet-seven.vercel.app'] 
+    : 'http://localhost:5173',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -45,8 +58,9 @@ app.use((req, res, next) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
+    console.error('Server error:', err);
     res.status(status).json({ message });
-    throw err;
+    // Don't throw the error after sending response
   });
 
   // importantly only setup vite in development and after
