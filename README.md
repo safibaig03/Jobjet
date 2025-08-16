@@ -198,9 +198,3 @@ Your application is already configured to use Neon Postgres. Make sure your data
 After deploying, you may need to run database migrations:
 
 
-## ☕ Support My Work
-<p align="center">
-  <a href="https://www.buymeacoffee.com/safibaig03">
-    <img src="https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" height="28">
-  </a>
-</p>
