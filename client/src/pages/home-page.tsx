@@ -118,7 +118,7 @@ export default function HomePage() {
                     </Button>
                   </Link>
                   <Link href="/jobs">
-                    <Button size="lg" variant="outline" className="border-white text-white hover:bg-primary-700">
+                    <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
                       Browse Jobs
                     </Button>
                   </Link>
