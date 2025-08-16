@@ -35,7 +35,18 @@ export default function handler(req, res) {
       // Forward cookies from the response for session management
       const setCookieHeader = response.headers.get('set-cookie');
       if (setCookieHeader) {
-        res.setHeader('Set-Cookie', setCookieHeader);
+        // Parse and modify cookies for Vercel environment
+        const cookies = setCookieHeader.split(',').map(cookie => {
+          // Ensure cookies work in production environment
+          if (!cookie.includes('SameSite=None')) {
+            cookie = cookie.replace(/SameSite=Lax/gi, 'SameSite=None');
+          }
+          if (!cookie.includes('Secure')) {
+            cookie = cookie + '; Secure';
+          }
+          return cookie;
+        });
+        res.setHeader('Set-Cookie', cookies);
       }
       
       // Try to parse as JSON, but handle other content types

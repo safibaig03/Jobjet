@@ -5,6 +5,7 @@
   "env": {
     "DATABASE_URL": "postgresql://neondb_owner:npg_gW2xIPzD1XuZ@ep-broad-hat-a1b8cxea-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require",
     "SESSION_SECRET": "jobboard-secret",
-    "SERVER_URL": "https://jobjet-3a5ndb2rh-safiullabaig786-gmailcoms-projects.vercel.app/"
+    "SERVER_URL": "https://jobjet-seven.vercel.app/",
+    "NODE_ENV": "production"
   }
 }
