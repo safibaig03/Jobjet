@@ -11,6 +11,7 @@ import PostJob from "@/pages/post-job";
 import JobListings from "@/pages/job-listings";
 import Applications from "@/pages/applications";
 import Resources from "@/pages/resources";
+import Companies from "@/pages/companies";
 import { ProtectedRoute } from "./lib/protected-route";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ThemeProvider } from "@/hooks/use-theme";
@@ -22,6 +23,7 @@ function Router() {
       <Route path="/auth" component={AuthPage} />
       <Route path="/jobs" component={JobListings} />
       <Route path="/job/:id" component={JobDetails} />
+      <Route path="/companies" component={Companies} />
       <Route path="/resources" component={Resources} />
       <ProtectedRoute path="/dashboard" component={CompanyDashboard} roles={["company"]} />
       <ProtectedRoute path="/post-job" component={PostJob} roles={["company"]} />
