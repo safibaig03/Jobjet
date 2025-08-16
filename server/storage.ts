@@ -5,6 +5,7 @@ import type { User, Company, Job, Application } from "@shared/schema";
 import connectPgSimple from "connect-pg-simple";
 import session from "express-session";
 import { Pool } from "pg";
+import { neon } from "@neondatabase/serverless";
 
 export class PostgresStorage {
   // Session store
@@ -12,30 +13,88 @@ export class PostgresStorage {
 
   constructor() {
     const pgSession = connectPgSimple(session);
-    const sessionPool = new Pool({ connectionString: process.env.DATABASE_URL });
+    let sessionStore;
     
-    // Create session table if it doesn't exist
-    sessionPool.query(`
-    CREATE TABLE IF NOT EXISTS "session" (
-      "sid" varchar NOT NULL COLLATE "default",
-      "sess" json NOT NULL,
-      "expire" timestamp(6) NOT NULL,
-      CONSTRAINT "session_pkey" PRIMARY KEY ("sid")
-    );
-    CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire");
-    `).catch(err => console.error('Error creating session table:', err));
-    
-    this.sessionStore = new pgSession({
-      pool: sessionPool,
-      tableName: 'session',
+    if (process.env.NODE_ENV === 'production') {
+      // For Vercel/serverless environment
+      console.log('Using Neon serverless driver for session store');
+      
+      // Create a custom store that uses the Neon serverless client
+      const sql = neon(process.env.DATABASE_URL);
+      
+      // Create session table if it doesn't exist - using async/await pattern
+      (async () => {
+        try {
+          await sql(`
+          CREATE TABLE IF NOT EXISTS "session" (
+            "sid" varchar NOT NULL,
+            "sess" json NOT NULL,
+            "expire" timestamp(6) NOT NULL,
+            CONSTRAINT "session_pkey" PRIMARY KEY ("sid")
+          );
+          CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire");
+          `);
+          console.log('Session table created or verified successfully');
+        } catch (err) {
+          console.error('Error creating session table:', err);
+        }
+      })();
+      
+      // Use a custom store configuration for serverless
+      this.sessionStore = new pgSession({
+        // Use a custom query function that uses the Neon serverless client
+        pool: {
+          query: async (text, params) => {
+            try {
+              const result = await sql(text, params);
+              // Format the result to match pg Pool query result format
+              return {
+                rows: Array.isArray(result) ? result : [],
+                rowCount: Array.isArray(result) ? result.length : 0
+              };
+            } catch (error) {
+              console.error('Session store query error:', error);
+              throw error;
+            }
+          }
+        },
+        tableName: 'session',
+        createTableIfMissing: true
+      });
+    } else {
+      // For local development, use regular Pool
+      console.log('Using regular Pool for session store');
+      const sessionPool = new Pool({ connectionString: process.env.DATABASE_URL });
+      
+      // Create session table if it doesn't exist
+      sessionPool.query(`
+      CREATE TABLE IF NOT EXISTS "session" (
+        "sid" varchar NOT NULL COLLATE "default",
+        "sess" json NOT NULL,
+        "expire" timestamp(6) NOT NULL,
+        CONSTRAINT "session_pkey" PRIMARY KEY ("sid")
+      );
+      CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire");
+      `).catch(err => console.error('Error creating session table:', err));
+      
+      this.sessionStore = new pgSession({
+        pool: sessionPool,
+        tableName: 'session',
       createTableIfMissing: true
     });
   }
 
   // Users
   async createUser(user: User) {
-    const [u] = await db.insert(users).values(user).returning();
-    return u;
+    try {
+      console.log('PostgresStorage.createUser: Inserting user into database');
+      const [u] = await db.insert(users).values(user).returning();
+      console.log('PostgresStorage.createUser: User inserted successfully, returning user with ID:', u.id);
+      return u;
+    } catch (error) {
+      console.error('PostgresStorage.createUser: Error creating user:', error);
+      throw error;
+    }
   }
 
   async getUserById(id: number) {
