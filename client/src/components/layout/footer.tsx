@@ -77,23 +77,23 @@ export function Footer() {
         </div>
         <div className="mt-12 border-t border-slate-700 pt-8 flex flex-col md:flex-row items-center justify-between">
           <div className="flex space-x-6 md:order-2">
-            <a href="https://facebook.com/jobjet" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-slate-300">
+            <a href="/" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-slate-300">
               <span className="sr-only">Facebook</span>
               <Facebook className="h-6 w-6" />
             </a>
-            <a href="https://instagram.com/jobjet" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-slate-300">
+            <a href="/" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-slate-300">
               <span className="sr-only">Instagram</span>
               <Instagram className="h-6 w-6" />
             </a>
-            <a href="https://twitter.com/jobjet" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-slate-300">
+            <a href="/" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-slate-300">
               <span className="sr-only">Twitter</span>
               <Twitter className="h-6 w-6" />
             </a>
-            <a href="https://linkedin.com/company/jobjet" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-slate-300">
+            <a href="/" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-slate-300">
               <span className="sr-only">LinkedIn</span>
               <Linkedin className="h-6 w-6" />
             </a>
-            <a href="https://github.com/jobjet" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-slate-300">
+            <a href="/" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-slate-300">
               <span className="sr-only">GitHub</span>
               <Github className="h-6 w-6" />
             </a>
