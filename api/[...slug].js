@@ -24,7 +24,7 @@ export default async function handler(req, res) {
       },
       body: (req.method !== 'GET' && req.method !== 'HEAD') ? JSON.stringify(req.body) : undefined,
     });
-
+//..
     res.status(response.status);
     response.headers.forEach((value, name) => {
       if (name.toLowerCase() !== 'content-encoding') {
