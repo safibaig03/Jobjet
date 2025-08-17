@@ -33,7 +33,7 @@ const passwordResetTokens = new Map<string, { userId: number; expires: Date }>()
 
 export function setupAuth(app: Express) {
   const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET || "jobboard-secret",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: storage.sessionStore,
