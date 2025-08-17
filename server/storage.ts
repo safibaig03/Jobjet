@@ -94,9 +94,13 @@ export class PostgresStorage {
   }
 
   async getJobById(id: number) {
-    return db.query.jobs.findFirst({ where: eq(jobs.id, id) });
-  }
+    const result = await db.select().from(jobs).where(eq(jobs.id, id)).limit(1);
 
+    result[0];
+  }
+  // async getJobById(id: number) {
+  //   return db.query.jobs.findFirst({ where: eq(jobs.id, id) });
+  // }
   async listJobs() {
     return db.select().from(jobs);
   }
