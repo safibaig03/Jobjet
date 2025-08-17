@@ -35,7 +35,7 @@ function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Navbar />
-      <main className="min-h-[calc(100vh-64px-200px)]">{children}</main>
+      <main className="min-h-[calc(100vh-64px-300px)]">{children}</main>
       <Footer />
     </>
   );
