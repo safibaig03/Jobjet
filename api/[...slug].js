@@ -7,28 +7,26 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'SERVER_URL is not configured.' });
   }
 
-  // ✅ CORRECT WAY TO GET THE PATH
-  // For a request to /api/jobs/1, req.query.slug will be ['jobs', '1']
-  const path = req.query.slug.join('/');
+  // ✅ NEW ROBUST WAY TO GET THE PATH
+  // req.url will be something like '/api/jobs?param=1'
+  // We remove the '/api' prefix to get the real path.
+  const path = req.url.replace('/api', '');
 
-  // ✅ BUILDS THE CORRECT URL (e.g., https://your-backend.com/jobs/1)
-  const backendUrl = `${serverUrl}/${path}`;
+  // ✅ BUILDS THE CORRECT URL (e.g., https://your-backend.com/jobs?param=1)
+  const backendUrl = `${serverUrl}${path}`;
 
   try {
     const response = await fetch(backendUrl, {
       method: req.method,
       headers: {
         'Content-Type': 'application/json',
-        'Cookie': req.headers.cookie || '', // Forward cookies for sessions
+        'Cookie': req.headers.cookie || '',
       },
       body: (req.method !== 'GET' && req.method !== 'HEAD') ? JSON.stringify(req.body) : undefined,
     });
 
-    // --- The rest of the code is for forwarding the response and is fine ---
-
     res.status(response.status);
     response.headers.forEach((value, name) => {
-      // Don't forward the 'content-encoding' header, as Vercel handles compression.
       if (name.toLowerCase() !== 'content-encoding') {
         res.setHeader(name, value);
       }
