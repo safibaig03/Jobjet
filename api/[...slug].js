@@ -7,13 +7,9 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'SERVER_URL is not configured.' });
   }
 
-  // ✅ NEW ROBUST WAY TO GET THE PATH
-  // req.url will be something like '/api/jobs?param=1'
-  // We remove the '/api' prefix to get the real path.
-  const path = req.url.replace('/api', '');
-
-  // ✅ BUILDS THE CORRECT URL (e.g., https://your-backend.com/jobs?param=1)
-  const backendUrl = `${serverUrl}${path}`;
+  // ✅ This is the correct line.
+  // It takes the original URL (e.g., /api/jobs) and forwards it directly.
+  const backendUrl = `${serverUrl}${req.url}`;
 
   try {
     const response = await fetch(backendUrl, {
@@ -24,7 +20,7 @@ export default async function handler(req, res) {
       },
       body: (req.method !== 'GET' && req.method !== 'HEAD') ? JSON.stringify(req.body) : undefined,
     });
-//..
+
     res.status(response.status);
     response.headers.forEach((value, name) => {
       if (name.toLowerCase() !== 'content-encoding') {
