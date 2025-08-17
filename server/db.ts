@@ -1,18 +1,16 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import * as schema from "@shared/schema";
-import { Pool } from 'pg';
+// server/db.ts
+
+import { drizzle } from 'drizzle-orm/neon-http';
+import { neon } from '@neondatabase/serverless';
+import * as schema from '@shared/schema';
 import "dotenv/config";
 
 if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL not set");
+  throw new Error('DATABASE_URL environment variable is not set');
 }
 
-// Use Pool for database connection
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+// This creates a special connection pool that is safe for serverless environments.
+const sql = neon(process.env.DATABASE_URL);
 
-const db = drizzle(pool, { schema });
-
-
-export { db };
+// This creates your Drizzle client using the serverless-safe connection.
+export const db = drizzle(sql, { schema });
