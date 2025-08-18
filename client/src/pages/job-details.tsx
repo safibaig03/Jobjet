@@ -27,15 +27,17 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function JobDetails() {
   const { id } = useParams();
-  const jobId = parseInt(id);
+  // Convert jobId to a number only if it's a valid number
+  const jobId = id ? (!isNaN(parseInt(id)) ? parseInt(id) : null) : null;
   const [, navigate] = useLocation();
   const { user, isJobSeeker } = useAuth();
   const { setSelectedJob } = useJobStore();
   const { toast } = useToast();
 
   // Fetch job details
-  const { data: job, isLoading, error } = useQuery<Job>({
-    queryKey: [`/api/jobs/${jobId}`],
+  const { data: job, isLoading, error } = useQuery<Job>({    
+    queryKey: [jobId ? `/api/jobs/${jobId}` : null],
+    enabled: !!jobId,
   });
 
   // State for application form
