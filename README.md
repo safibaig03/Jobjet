@@ -8,8 +8,6 @@ A modern, full-stack job board platform connecting job seekers and companies. Bu
 
 ### ✨ **[Live Demo](https://jobjet-beryl.vercel.app/)** ✨
 
-![JobJet Screenshot](https://via.placeholder.com/800x450.png?text=JobJet+Application+Screenshot)
-
 ## 🌟 Key Features
 
 - Dual User Roles: Distinct dashboards and functionalities for Job Seekers and Companies.
