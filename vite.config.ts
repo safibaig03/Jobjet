@@ -12,6 +12,7 @@ const __dirname = dirname(__filename);
 
 // This is the new, Vercel-compatible configuration
 export default defineConfig({
+  root: 'client',
   plugins: [
     react(),
     runtimeErrorOverlay(),
