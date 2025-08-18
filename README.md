@@ -1,200 +1,106 @@
-# JobJet
+# JobJet 🚀
 
-A modern full-stack job board platform built with React, Express.js, and PostgreSQL. Features job seeker and recruiter (company) roles, job posting/browsing, company profiles, learning resources, and a consistent, mobile-friendly UI/UX.
+[![Status](https://img.shields.io/badge/status-active-success.svg)]()
 
-## 📋 Prerequisites
+A modern, full-stack job board platform connecting job seekers and companies. Built with React, Express.js, and PostgreSQL, it features distinct roles, company profiles, learning resources, and a clean, mobile-friendly UI/UX.
 
-- Node.js 18+ and npm 8+
-- Git repository with your JobJet code
-- Neon Postgres database account (already set up in your .env file)
+---
 
-## 🚀 Local Setup Instructions
+### ✨ **[Live Demo](https://jobjet-beryl.vercel.app/)** ✨
 
-### 1. Clone or Download the Repository
-```bash
-git clone <repository-url>
-cd jobjet
-```
+## 🌟 Key Features
 
-### 2. Install Dependencies
-```bash
-npm install
-```
+- Dual User Roles: Distinct dashboards and functionalities for Job Seekers and Companies.
+- Company Profiles: Companies can register and manage their own profile and job postings.
+- Job Management: Companies can create, read, update, and delete job listings.
+- Job Search & Apply: Job seekers can browse, search, and apply for jobs.
+- Secure Authentication: Session-based authentication with password hashing and role-based access control.
+- Forgot Password: Secure, token-based password reset functionality.
+- Learning Resources: A dedicated section with curated resources to help job seekers.
 
-### 3. Environment Setup
-Create a `.env` file in the root directory for custom configuration:
-```env
-DATABASE_URL=your-neon-postgres-url
-SESSION_SECRET=your-custom-session-secret
+## 🛠️ Tech Stack
+
+This project is built with a modern, decoupled architecture, ensuring scalability and maintainability.
+
+| Category        | Technology                                                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------------------------ |
+| 🎨 Frontend     | React, TypeScript, Vite, TanStack Query, Zustand, Wouter, React Hook Form, Zod, Shadcn/UI, Tailwind CSS      |
+| ⚙️ Backend      | Node.js, Express.js, TypeScript, Passport.js                                                                 |
+| 💾 Database     | PostgreSQL, Neon (Hosting), Drizzle ORM                                                                      |
+| 🚀 Deployment   | Vercel (Frontend), Render (Backend)                                                                          |
+
+## 🚀 Getting Started (Local Development)
+
+Follow these instructions to set up and run the project on your local machine.
+
+### Prerequisites
+
+- Node.js (v18 or later)
+- Git
+- A free Neon account for the PostgreSQL database.
+
+### Installation & Setup
+
+1. Clone the repository:
+   git clone https://github.com/safibaig03/jobjet.git
+   cd jobjet
+
+2. Set up the Backend Server:
+   cd server
+   npm install
+   cp .env.example .env
+   (Now, open the newly created /server/.env file and add your Neon database URL and a session secret.)
+
+3. Set up the Frontend Client:
+   cd ../client
+   npm install
+   (The frontend client does not require an .env file for local development, as it will proxy requests using vite.config.js.)
+
+### Running the Application
+
+1. Start the Backend Server:
+   cd server
+   npm run dev
+   (Your backend API will be running on http://localhost:5000 or the port you specified in .env.)
+
+2. Start the Frontend Development Server:
+   cd client
+   npm run dev
+   (Your React application will be available at http://localhost:5173.)
+
+## 🔑 Environment Variables
+
+To run this project, you will need to create a `.env` file in the `/server` directory.
+
+#### Backend (`/server/.env.example`)
+
+DATABASE_URL="postgresql://user:password@host:port/dbname"
+SESSION_SECRET="your_super_secret_session_key"
 PORT=5000
-```
 
-### 4. Start Development Server
-```bash
-npm run dev
-```
+## ⚙️ API & System Design
 
-The application will be available at: **http://localhost:5000**
+The backend is a robust RESTful API built with Express.js.
 
-## 🛠️ How It Works
+- Authentication: Utilizes Passport.js for session-based authentication with a local username/password strategy. Passwords are securely hashed using crypto.scrypt.
+- Authorization: Role-based access control (RBAC) middleware protects routes, ensuring only authorized users (e.g., job_seeker, company) can access specific endpoints.
+- Database Interaction: Uses Drizzle ORM for type-safe SQL queries, interacting with the PostgreSQL database hosted on Neon.
+- Validation: Leverages Zod for schema validation on both request bodies and environment variables, ensuring data integrity.
+- API Endpoints: Provides a full suite of CRUD operations for Jobs, Companies, Applications, and Resources.
 
-### System Architecture
+## 🚀 Deployment
 
-#### Frontend Architecture
-- **React 18** with TypeScript for type safety
-- **Component-based design** using Shadcn/ui for consistent UI components
-- **Client-side routing** with Wouter for lightweight navigation
-- **State management** using Zustand for job filtering and search state
-- **Data fetching** with TanStack Query for efficient server state management
-- **Form handling** with React Hook Form and Zod validation
-- **Styling** with Tailwind CSS and custom theme system
+This application is deployed using a dual-hosting strategy for optimal performance and scalability:
 
-#### Backend Architecture
-- **Express.js** server with TypeScript for API endpoints
-- **Session-based authentication** using Passport.js with LocalStrategy
-- **PostgreSQL database** with Drizzle ORM for data persistence
-- **RESTful API design** with proper HTTP status codes and error handling
-- **Schema validation** using Zod for request/response validation
-- **Role-based access control** with user types: job_seeker, company, admin
+- The Backend is deployed as a Web Service on Render. It connects to the production Neon database via environment variables.
+- The Frontend is deployed on Vercel. A vercel.json file automatically proxies all /api requests to the live backend on Render, creating a seamless full-stack experience.
 
-### Authentication System
+---
 
-The application uses built-in authentication with session-based management:
+## 👨‍💻 About the Author
 
-- **Session-based authentication** using Passport.js (Local Strategy)
-- **Password hashing** with crypto.scrypt for security
-- **Role-based access control** (Job Seeker, Company)
-- **Protected routes** for authenticated users
-- **Automatic company profile creation** for company users
-- **Forgot Password** functionality with secure token-based reset
-
-Authentication routes are defined in `server/auth.ts` and include:
-
-```typescript
-// Authentication endpoints
-app.post("/api/register", async (req, res) => { /* User registration logic */ });
-app.post("/api/login", passport.authenticate("local"), (req, res) => { /* Login logic */ });
-app.post("/api/logout", (req, res) => { /* Logout logic */ });
-app.get("/api/user", (req, res) => { /* Get current user logic */ });
-app.post("/api/forgot-password", async (req, res) => { /* Password reset request logic */ });
-app.post("/api/reset-password", async (req, res) => { /* Password reset logic */ });
-```
-
-### API Routes and Functions
-
-The application provides a comprehensive set of API endpoints defined in `server/routes.ts`:
-
-#### Jobs API
-
-```typescript
-// Get all jobs with optional filtering
-app.get("/api/jobs", async (req, res) => { /* Get jobs with filtering logic */ });
-
-// Get job by ID
-app.get("/api/jobs/:id", async (req, res) => { /* Get job details logic */ });
-
-// Create new job (company role only)
-app.post("/api/jobs", isAuthenticated, hasRole(['company', 'admin']), async (req, res) => { /* Create job logic */ });
-
-// Update job (company role only)
-app.put("/api/jobs/:id", isAuthenticated, hasRole(['company', 'admin']), async (req, res) => { /* Update job logic */ });
-
-// Delete job (company role only)
-app.delete("/api/jobs/:id", isAuthenticated, hasRole(['company', 'admin']), async (req, res) => { /* Delete job logic */ });
-```
-
-#### Companies API
-
-```typescript
-// Get all companies
-app.get("/api/companies", async (req, res) => { /* Get companies logic */ });
-
-// Get company by ID
-app.get("/api/companies/:id", async (req, res) => { /* Get company details logic */ });
-
-// Update company (company role only)
-app.put("/api/companies/:id", isAuthenticated, hasRole(['company', 'admin']), async (req, res) => { /* Update company logic */ });
-```
-
-#### Applications API
-
-```typescript
-// Apply to job (job seeker role only)
-app.post("/api/jobs/:id/apply", isAuthenticated, hasRole(['job_seeker']), async (req, res) => { /* Apply to job logic */ });
-
-// Get applications for a job (company role only)
-app.get("/api/jobs/:id/applications", isAuthenticated, hasRole(['company', 'admin']), async (req, res) => { /* Get applications logic */ });
-
-// Get user's applications (job seeker role only)
-app.get("/api/applications", isAuthenticated, hasRole(['job_seeker']), async (req, res) => { /* Get user applications logic */ });
-```
-
-#### Resources API
-
-```typescript
-// Get learning resources
-app.get("/api/resources", async (req, res) => { /* Get resources logic */ });
-```
-
-### Database Schema
-
-The application uses Drizzle ORM with PostgreSQL. Key tables include:
-
-- **users**: User accounts with authentication details
-- **companies**: Company profiles linked to company user accounts
-- **jobs**: Job listings with details and requirements
-- **applications**: Job applications linking users to jobs
-- **categories**: Job categories for classification
-- **resources**: Learning resources for career development
-- **session**: Session storage for authentication
-
-### Middleware
-
-The application uses several middleware functions for authentication and authorization:
-
-```typescript
-// Check if user is authenticated
-const isAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.status(401).json({ message: "Unauthorized" });
-};
-
-// Check if user has a specific role
-const hasRole = (roles) => (req, res, next) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-  
-  if (roles.includes(req.user.role)) {
-    return next();
-  }
-  
-  res.status(403).json({ message: "Forbidden" });
-};
-```
-
-## 🚀 Deployment 
-
- Vercel
-
-1. Install Vercel CLI: `npm i -g vercel`
-2. Login to Vercel: `vercel login`
-3. Deploy: `vercel`
-4. Set environment variables in Vercel dashboard:
-   - `DATABASE_URL`
-   - `SESSION_SECRET`
-
-
-## 📊 Database 
-
-### Using Neon Postgres
-
-Your application is already configured to use Neon Postgres. Make sure your database URL is correctly set in the environment variables of your hosting platform.
-
-### Running Migrations
-
-After deploying, you may need to run database migrations:
-
-
+Created by **Mirza Safiulla Baig**  
+- 🎓 B.Tech in CSE (AI & ML), Keshav Memorial Institute of Technology  
+- 💡 Passionate about building modern web apps, AI/ML solutions, and scalable software systems  
+- 🌐 LinkedIn: https://www.linkedin.com/in/safibaig03  
+- 💻 GitHub: https://github.com/safibaig03
